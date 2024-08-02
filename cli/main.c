@@ -24,6 +24,10 @@ enum longopt {
         opt_disable_jump_table = 0x100,
         opt_disable_localtype_cellidx,
         opt_disable_resulttype_cellidx,
+        opt_report_to_file,
+        opt_bool_report,
+        opt_type_report,
+        opt_stacktrace_report,
 #if defined(TOYWASM_ENABLE_DYLD)
         opt_dyld,
         opt_dyld_bindnow,
@@ -50,6 +54,7 @@ enum longopt {
         opt_wasi,
         opt_wasi_dir,
         opt_wasi_env,
+
 #endif
 #if defined(TOYWASM_ENABLE_WASI_LITTLEFS)
         opt_wasi_littlefs_dir,
@@ -156,6 +161,30 @@ static const struct option longopts[] = {
                 required_argument,
                 NULL,
                 opt_timeout,
+        },
+        {
+                "report_to_file",
+                no_argument,
+                NULL,
+                opt_report_to_file,
+        },
+        {
+                "bool_report",
+                no_argument,
+                NULL,
+                opt_bool_report,
+        },
+        {
+                "type_report",
+                no_argument,
+                NULL,
+                opt_type_report,
+        },
+        {
+                "stacktrace_report",
+                no_argument,
+                NULL,
+                opt_stacktrace_report,
         },
 #if defined(TOYWASM_ENABLE_TRACING)
         {
@@ -305,6 +334,18 @@ main(int argc, char *const *argv)
                 case opt_disable_jump_table:
                         opts->load_options.generate_jump_table = false;
                         break;
+                case opt_report_to_file:
+                        set_report_to_file(true);
+                        break;
+                case opt_bool_report:
+                        set_report_level(BOOL_REPORT);
+                        break;
+                case opt_type_report:
+                        set_report_level(TYPE_REPORT);
+                        break;
+                case opt_stacktrace_report:
+                        set_report_level(STACKTRACE_REPORT);
+                        break;
                 case opt_disable_localtype_cellidx:
 #if defined(TOYWASM_USE_LOCALTYPE_CELLIDX)
                         opts->load_options.generate_localtype_cellidx = false;
@@ -419,6 +460,7 @@ main(int argc, char *const *argv)
                                 goto fail;
                         }
                         break;
+
 #endif
 #if defined(TOYWASM_ENABLE_WASI_LITTLEFS)
                 case opt_wasi_littlefs_dir:
